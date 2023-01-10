@@ -11,6 +11,24 @@ body {
     display:flex;
     justify-content: center;
 }
+
+.inputs{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+button {
+    font-size: 16px;
+    height: 40px;
+    width: 350px;
+    margin:5px auto;
+}
+
+#slide-value {
+    margin: auto;
+}
+
 #border {
     border: 100px ridge red; 
     border-radius: 10px;
