@@ -10,7 +10,7 @@
 <body>
 
     <div class="container">
-        <h1 class="header">8bit Scretch Pad</h1>
+        <div class="header"><h1>8bit Scretch Pad</h1></div>
         <div class="container">
             <div id="border">
                 <div id="canvas"></div>
@@ -20,13 +20,12 @@
 
 
 <script>
-
+//document elements 
 const container = document.querySelector(".container");
 const canvas = document.querySelector("#canvas");
-canvas.addEventListener("load", createGrid(16))
+let pixels = '';
 
-//event listners
-
+// These functions create the square grid. The number of of boxes in a row can be adjusted with input  
 function createGrid(gridSize){
     removePixel();
     let gridArea = gridSize**2;
@@ -37,25 +36,45 @@ function createGrid(gridSize){
         div.setAttribute("class", "pixel");
         div.setAttribute("style",pixelSize(gridSize))
     }
+    updatePixels();
 }
-
+//adjusts the box size depending on number of boxes are in a row. the canvas size stays constant 
 function pixelSize(gridSize){
-    let pixelSize = 700/gridSize-2;
-    let outPut = `border:1px solid black; height:${pixelSize}px; width: ${pixelSize}px`
-    return outPut;
+        let pixelSize = 900/gridSize;
+        let outPut = `height:${pixelSize}px; width: ${pixelSize}px`
+        return outPut;
 }
 
+function updatePixels(){
+    const currentPixels = canvas.querySelectorAll(".pixel");
+    pixels = currentPixels;
+    pixels.forEach(pixel => pixel)
+    canvas.addEventListener("mouseover",draw())
+}
+
+//removes grid if one exisists.
 function removePixel(){
-    while (canvas.firstChild){
-        canvas.removeChild(canvas.firstChild);
-    }
+        while (canvas.firstChild){
+            canvas.removeChild(canvas.firstChild);
+        }
 }
 
-function pixelId(){
-    const pixels = document.querySelectorAll(".pixel");
-    pixels.forEach(pixel => pixel.addEventListener("mouseover", function(){console.log(pixel.id)}))
+function draw(){
+    pixels.forEach(pixel => pixel.addEventListener("mouseover", ()=> pixel.classList.add("draw")))
 }
 
+function clear(){
+    pixels.forEach(pixel => pixel.classList.remove("draw"))
+}
+
+canvas.addEventListener("load", createGrid(16));
+
+
+//canvas loads with size of 16x16 boxes
+
+// function getId(){
+//     pixels.forEach(pixel => pixel.addEventListener("click", ()=> console.log(pixel.id)))
+// }
 </script>
 </body>
 </html>
