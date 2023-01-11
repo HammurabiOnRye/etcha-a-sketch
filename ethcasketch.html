@@ -7,19 +7,30 @@
     <link rel="stylesheet" href="style.css ">
     <title>Etch a Sketch</title>
 </head>
-<body>
+<body draggable="false">
 
     <div class="container">
-        <div class="header"><h1>Etch a Sketch</h1></div>
-        <div class="inputs">
+        <div class="header">
+            <h1>Etch a Sketch</h1>
+            <h2>Pick canvas size from 1x1 - 64x64</h2>
             <input type="range" min="1" max="64" value="16" id="pixel-size">
             <h2 id="slide-value"></h2>
-            <button id="random-color">Random Colors</button>
-            <button id="clear">Clear</button>
         </div>
-        <div class="container">
-            <div id="border">
-                <div id="canvas"></div>
+        
+        <div class="container" draggable="false">
+            <div id="border" draggable="false">
+                <div id="canvas" draggable="false"></div>
+                <div class="inputs">
+                    <div id="select-color">
+                        <h2 id="color-value">Pick a Color</h2>
+                        <input type="color" id="color-select">
+                    </div>
+                    
+                    <div id="buttons">
+                        <button id="random-color">Random Colors</button>
+                        <button id="clear">Clear</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -27,64 +38,91 @@
 
 <script>
 //document elements 
-const container = document.querySelector(".container");
 const canvas = document.querySelector("#canvas");
-const slide = document.querySelector("#pixel-size")
-const clear = document.querySelector("#clear")
-const slideValue= document.querySelector("#slide-value")
-let pixels = '';
+const colorValue = document.querySelector("#color-select");
+const slide = document.querySelector("#pixel-size");
+const value = document.querySelector("#slide-value");
+
+//determines whether color is random or selected
+let colorRandom = false;
+
+//event listeners 
+//creates defualt 16x16 square grid 
+createGrid(slide)
+//determines whether the random color button was pressed
+addGlobalEventListener("click", "#random-color", e=> colorRandom=true)
+addGlobalEventListener("mouseup", "#color-select", e=> colorRandom=false )
+//creates new grid based on slider value
+addGlobalEventListener("mouseup", "#pixel-size", e=> createGrid(e.target));
+//calls draw function on the created divs when the mouse is over them
+addGlobalEventListener("mouseover", ".pixel", e=> draw(e.target));
+//clears the canvas when the clear button is pressed 
+addGlobalEventListener("click", "#clear", e=> clear(e));
+
+function addGlobalEventListener(type,selector,callback){
+    document.addEventListener(type, e=>{
+    if (e.target.matches(selector)) callback(e);
+})
+};
 
 // These functions create the square grid. The number of of boxes in a row can be adjusted with input  
-function createGrid(gridSize){
+function createGrid(e){
     removePixel();
-    let gridArea = gridSize**2;
+    let gridArea = e.value**2;
     for (let i=1; i<=gridArea; i++){
         let div = document.createElement("div");
         canvas.append(div);
         div.setAttribute("id", "pixel-"+i);
         div.setAttribute("class", "pixel");
-        div.setAttribute("style",pixelSize(gridSize))
+        div.setAttribute("style",pixelSize(e.value))
+        div.setAttribute("draggable", false)
     }
-    updatePixels();
-    addEventListeners();
-    slideValue.innerText = slide.value;
-}
-//adjusts the box size depending on number of boxes are in a row. the canvas size stays constant 
+    updateSlideValue()
+};
+//adjusts the size of individual squares in the grid based on the size of the grid.
 function pixelSize(gridSize){
         let pixelSize = 900/gridSize;
         let outPut = `height:${pixelSize}px; width: ${pixelSize}px`
         return outPut;
-}
+};
 
-//adds the event listeners
-function addEventListeners(){
-    canvas.addEventListener("mousedown", draw())
-    clear.addEventListener("click", ()=>  clearCanvas())
-    slide.addEventListener("click", ()=> createGrid(slide.value))
-}
-
-//updates the pizels value when it is changes
-function updatePixels(){
-    const currentPixels = canvas.querySelectorAll(".pixel");
-    pixels = currentPixels;
-}
-
-//removes grid if one exisists.
+//removes the grid from the canvas
 function removePixel(){
         while (canvas.firstChild){
             canvas.removeChild(canvas.firstChild);
         }
-}
+};
 
-function draw(){
-    pixels.forEach(pixel => pixel.addEventListener("mouseover", ()=> pixel.style.backgroundColor ="black"))
-}
+//updates the box size under the slider
+function updateSlideValue(){
+    value.innerText=slide.value+"x"+slide.value;
+};
 
-function clearCanvas(){
-    pixels.forEach(pixel => pixel.style.backgroundColor ="antiquewhite")
-}
+//fills created divs with color determined by either random color or color selector value
+function draw(e){
+    if (colorRandom === true){
+        e.style.backgroundColor = randomColor();
+    } else {
+        e.style.backgroundColor = colorValue.value;
+    }
+};
 
-canvas.addEventListener("load", createGrid(16));
+//clears the canvas 
+function clear(e){
+    const pixels = document.querySelectorAll(".pixel");
+    pixels.forEach(pixel => pixel.style.backgroundColor="antiquewhite")
+};
+
+//genrates a random number between 0 and 255
+function randomRGB(){
+    let randomColor = Math.floor(Math.random()*256);
+    return randomColor;
+};
+
+//returns rgb value based on randomRGB and returns it as a css style
+function randomColor(){
+    return "rgb("+randomRGB()+","+randomRGB()+","+randomRGB()+")"
+};
 </script>
 </body>
 </html>
